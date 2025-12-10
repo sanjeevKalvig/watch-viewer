@@ -23,7 +23,11 @@ export default function WatchModel({ strapColor }) {
     const scale = maxDim > 0 ? target / maxDim : 1;
 
     if (wrapperRef.current) {
-      wrapperRef.current.position.set(-center.x * scale, -center.y * scale, -center.z * scale);
+      wrapperRef.current.position.set(
+        -center.x * scale,
+        -center.y * scale,
+        -center.z * scale
+      );
       wrapperRef.current.scale.setScalar(scale);
     }
 
@@ -31,90 +35,95 @@ export default function WatchModel({ strapColor }) {
 
     scene.traverse((obj) => {
       if (obj.isMesh) {
-        if (obj.name === "Mesh_29" || obj.name === "Mesh_30") {
+        if (
+          obj.name === "Plane006" ||
+          obj.name === "Plane010" ||
+          obj.name === "Plane005" ||
+          obj.name === "Plane021"
+        ) {
+          // Create strap material with emissive for consistent color
           obj.material = new THREE.MeshStandardMaterial({
             color: strapColor,
-            roughness: 0.7,
-            metalness: 0.1,
+            roughness: 0.8, // Increased for less reflection
+            metalness: 0.05, // Reduced for more diffuse color
+            emissive: strapColor, // Makes color glow slightly
+            emissiveIntensity: 0.8, // 20% emissive glow
             normalMap: obj.material.normalMap,
             side: THREE.DoubleSide,
           });
           strapMeshes.current.push(obj);
         } else {
+          // Clone materials for other meshes
           if (Array.isArray(obj.material)) {
-            obj.material = obj.material.map(m => m.clone());
+            obj.material = obj.material.map((m) => m.clone());
           } else {
             obj.material = obj.material.clone();
           }
         }
       }
     });
-  }, [scene]);
+  }, [scene, strapColor]);
 
   useEffect(() => {
     if (strapMeshes.current.length > 0) {
       strapMeshes.current.forEach((mesh) => {
         mesh.material.color.set(strapColor);
+        mesh.material.emissive.set(strapColor); // Update emissive too
         mesh.material.needsUpdate = true;
       });
     }
   }, [strapColor]);
 
+  // Click handler for mesh name logging
+  const handleMeshClick = (event) => {
+    event.stopPropagation();
+    const clickedMesh = event.object;
+    console.log("Clicked mesh name:", clickedMesh.name);
+    console.log("Clicked mesh:", clickedMesh);
+  };
+
   return (
     <group>
-      <group ref={wrapperRef}>
+      <group ref={wrapperRef} onClick={handleMeshClick}>
         <primitive object={scene} />
       </group>
 
       {/* LEFT-TOP callout */}
       <LeftTopCallout />
-      
+
       {/* RIGHT-BOTTOM callout */}
       <RightBottomCallout />
     </group>
   );
 }
 
-// Individual Callout Components for maximum flexibility
-
+// [Rest of your callout components remain the same...]
 function LeftTopCallout() {
   const position = [-0.45, 0.28, 0.27];
   const dotPosition = [-0.2, 0.13, 0.28];
   const title = "200+";
   const subtitle = "Craftsmanship";
   const align = "right";
-  
-  // Calculate distances
+
   const totalDistanceX = position[0] - dotPosition[2];
   const totalDistanceY = position[1] - dotPosition[1];
   const totalDistanceZ = position[2] - dotPosition[2];
-  
-  // SHORT horizontal (20%) + LONG angled (80%)
+
   const bendPoint = [
-    dotPosition[0] + (totalDistanceX * 0.2),  // Only 20% horizontal (SHORT)
-    dotPosition[2],                            // Keep Y same (horizontal)
-    dotPosition[2] + (totalDistanceZ * 0.3)   // 20% Z
+    dotPosition[0] + totalDistanceX * 0.2,
+    dotPosition[2],
+    dotPosition[2] + totalDistanceZ * 0.3,
   ];
 
-  const linePoints = [
-    dotPosition,    // Dot
-    bendPoint,      // SHORT horizontal (20%)
-    position        // LONG angled (80%)
-  ];
+  const linePoints = [dotPosition, bendPoint, position];
 
   return (
     <group>
-      {/* Dot */}
       <mesh position={dotPosition} renderOrder={999}>
         <sphereGeometry args={[0.008, 16, 16]} />
-        <meshBasicMaterial 
-          color="#ffffff"
-          transparent
-          opacity={1}
-        />
+        <meshBasicMaterial color="#ffffff" transparent opacity={1} />
       </mesh>
-      
-      {/* Line: SHORT horizontal + LONG angled */}
+
       <Line
         points={linePoints}
         color="rgba(255, 255, 255, 0.5)"
@@ -123,44 +132,49 @@ function LeftTopCallout() {
         transparent
         opacity={0.7}
       />
-      
-      {/* Label */}
-      <Html 
-        position={position} 
+
+      <Html
+        position={position}
         center
-        style={{ pointerEvents: 'none' }}
+        style={{ pointerEvents: "none" }}
         zIndexRange={[100, 0]}
       >
-        <div style={{
-          textAlign: align,
-          whiteSpace: 'nowrap',
-          fontFamily: "'Helvetica Neue', 'Arial', sans-serif",
-        }}>
-          <div style={{ 
-            fontSize: '32px', 
-            fontWeight: '300',
-            color: '#ffffff',
-            lineHeight: '1',
-            marginBottom: '6px',
-            letterSpacing: '-1px'
-          }}>
+        <div
+          style={{
+            textAlign: align,
+            whiteSpace: "nowrap",
+            fontFamily: "'Helvetica Neue', 'Arial', sans-serif",
+          }}
+        >
+          <div
+            style={{
+              fontSize: "32px",
+              fontWeight: "300",
+              color: "#ffffff",
+              lineHeight: "1",
+              marginBottom: "6px",
+              letterSpacing: "-1px",
+            }}
+          >
             {title}
           </div>
-          
-          <div style={{
-            width: '40px',
-            height: '1px',
-            background: 'rgba(255, 255, 255, 0.3)',
-            margin: align === 'right' ? '0 0 6px auto' : '0 auto 6px 0'
-          }} />
-          
-          <div style={{ 
-            fontSize: '9px', 
-            color: 'rgba(255, 255, 255, 0.5)',
-            letterSpacing: '2px',
-            textTransform: 'uppercase',
-            fontWeight: '400'
-          }}>
+          <div
+            style={{
+              width: "40px",
+              height: "1px",
+              background: "rgba(255, 255, 255, 0.3)",
+              margin: align === "right" ? "0 0 6px auto" : "0 auto 6px 0",
+            }}
+          />
+          <div
+            style={{
+              fontSize: "9px",
+              color: "rgba(255, 255, 255, 0.5)",
+              letterSpacing: "2px",
+              textTransform: "uppercase",
+              fontWeight: "400",
+            }}
+          >
             {subtitle}
           </div>
         </div>
@@ -175,38 +189,26 @@ function RightBottomCallout() {
   const title = "100%";
   const subtitle = "Water Resistance";
   const align = "left";
-  
-  // Calculate distances
+
   const totalDistanceX = position[0] - dotPosition[0];
   const totalDistanceY = position[1] - dotPosition[1];
   const totalDistanceZ = position[2] - dotPosition[2];
-  
-  
+
   const bendPoint = [
-    dotPosition[0] + (totalDistanceX * 0.9),  
-   -dotPosition[0],                            
-    dotPosition[2] + (totalDistanceZ * 0.3)   
+    dotPosition[0] + totalDistanceX * 0.9,
+    -dotPosition[0],
+    dotPosition[2] + totalDistanceZ * 0.3,
   ];
 
-  const linePoints = [
-    dotPosition,    // Dot
-    bendPoint,      // SHORT horizontal (20%)
-    position        // LONG angled (80%)
-  ];
+  const linePoints = [dotPosition, bendPoint, position];
 
   return (
     <group>
-      {/* Dot */}
       <mesh position={dotPosition} renderOrder={999}>
         <sphereGeometry args={[0.008, 16, 16]} />
-        <meshBasicMaterial 
-          color="#ffffff"
-          transparent
-          opacity={1}
-        />
+        <meshBasicMaterial color="#ffffff" transparent opacity={1} />
       </mesh>
-      
-      {/* Line: SHORT horizontal + LONG angled */}
+
       <Line
         points={linePoints}
         color="rgba(255, 255, 255, 0.5)"
@@ -215,44 +217,49 @@ function RightBottomCallout() {
         transparent
         opacity={0.7}
       />
-      
-      {/* Label */}
-      <Html 
-        position={position} 
+
+      <Html
+        position={position}
         center
-        style={{ pointerEvents: 'none' }}
+        style={{ pointerEvents: "none" }}
         zIndexRange={[100, 0]}
       >
-        <div style={{
-          textAlign: align,
-          whiteSpace: 'nowrap',
-          fontFamily: "'Helvetica Neue', 'Arial', sans-serif",
-        }}>
-          <div style={{ 
-            fontSize: '32px', 
-            fontWeight: '300',
-            color: '#ffffff',
-            lineHeight: '1',
-            marginBottom: '6px',
-            letterSpacing: '-1px'
-          }}>
+        <div
+          style={{
+            textAlign: align,
+            whiteSpace: "nowrap",
+            fontFamily: "'Helvetica Neue', 'Arial', sans-serif",
+          }}
+        >
+          <div
+            style={{
+              fontSize: "32px",
+              fontWeight: "300",
+              color: "#ffffff",
+              lineHeight: "1",
+              marginTop: "40px",
+              letterSpacing: "-1px",
+            }}
+          >
             {title}
           </div>
-          
-          <div style={{
-            width: '40px',
-            height: '1px',
-            background: 'rgba(255, 255, 255, 0.3)',
-            margin: align === 'right' ? '0 0 6px auto' : '0 auto 6px 0'
-          }} />
-          
-          <div style={{ 
-            fontSize: '9px', 
-            color: 'rgba(255, 255, 255, 0.5)',
-            letterSpacing: '2px',
-            textTransform: 'uppercase',
-            fontWeight: '400'
-          }}>
+          <div
+            style={{
+              width: "40px",
+              height: "1px",
+              background: "rgba(255, 255, 255, 0.3)",
+              margin: align === "right" ? "0 0 6px auto" : "0 auto 6px 0",
+            }}
+          />
+          <div
+            style={{
+              fontSize: "9px",
+              color: "rgba(255, 255, 255, 0.5)",
+              letterSpacing: "2px",
+              textTransform: "uppercase",
+              fontWeight: "400",
+            }}
+          >
             {subtitle}
           </div>
         </div>
@@ -260,7 +267,5 @@ function RightBottomCallout() {
     </group>
   );
 }
-
-
 
 useGLTF.preload("/Watch.glb");
