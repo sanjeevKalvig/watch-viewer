@@ -26,7 +26,7 @@ export default function App() {
       </div>
 
       <Canvas
-        camera={{ position: [0, 0, 1.2], fov: 60 }}
+        camera={{ position: [0, 0, 1.2], fov: 65 }}
         dpr={[2, 3]}
         gl={{
           antialias: true,
