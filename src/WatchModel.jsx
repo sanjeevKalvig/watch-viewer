@@ -44,10 +44,10 @@ export default function WatchModel({ strapColor }) {
           // Create strap material with emissive for consistent color
           obj.material = new THREE.MeshStandardMaterial({
             color: strapColor,
-            roughness: 0.8, // Increased for less reflection
-            metalness: 0.05, // Reduced for more diffuse color
-            emissive: strapColor, // Makes color glow slightly
-            emissiveIntensity: 0.8, // 20% emissive glow
+            roughness: 0.8,
+            metalness: 0.05,
+            emissive: strapColor,
+            emissiveIntensity: 0.8,
             normalMap: obj.material.normalMap,
             side: THREE.DoubleSide,
           });
@@ -68,7 +68,7 @@ export default function WatchModel({ strapColor }) {
     if (strapMeshes.current.length > 0) {
       strapMeshes.current.forEach((mesh) => {
         mesh.material.color.set(strapColor);
-        mesh.material.emissive.set(strapColor); // Update emissive too
+        mesh.material.emissive.set(strapColor);
         mesh.material.needsUpdate = true;
       });
     }
@@ -97,7 +97,6 @@ export default function WatchModel({ strapColor }) {
   );
 }
 
-// [Rest of your callout components remain the same...]
 function LeftTopCallout() {
   const position = [-0.45, 0.28, 0.27];
   const dotPosition = [-0.2, 0.13, 0.28];
@@ -139,44 +138,73 @@ function LeftTopCallout() {
         style={{ pointerEvents: "none" }}
         zIndexRange={[100, 0]}
       >
-        <div
-          style={{
-            textAlign: align,
-            whiteSpace: "nowrap",
-            fontFamily: "'Helvetica Neue', 'Arial', sans-serif",
-          }}
-        >
-          <div
-            style={{
-              fontSize: "32px",
-              fontWeight: "300",
-              color: "#ffffff",
-              lineHeight: "1",
-              marginBottom: "6px",
-              letterSpacing: "-1px",
-            }}
-          >
-            {title}
-          </div>
-          <div
-            style={{
-              width: "40px",
-              height: "1px",
-              background: "rgba(255, 255, 255, 0.3)",
-              margin: align === "right" ? "0 0 6px auto" : "0 auto 6px 0",
-            }}
-          />
-          <div
-            style={{
-              fontSize: "9px",
-              color: "rgba(255, 255, 255, 0.5)",
-              letterSpacing: "2px",
-              textTransform: "uppercase",
-              fontWeight: "400",
-            }}
-          >
-            {subtitle}
-          </div>
+        <style>
+          {`
+            .callout-container {
+              text-align: ${align};
+              white-space: nowrap;
+              font-family: 'Helvetica Neue', 'Arial', sans-serif;
+            }
+
+            .callout-title {
+              font-weight: 300;
+              color: #ffffff;
+              line-height: 1;
+              margin-bottom: 6px;
+              letter-spacing: -1px;
+              font-size: 18px; /* xs: 20 * 0.9 = 18px */
+            }
+
+            .callout-divider {
+              width: 40px;
+              height: 1px;
+              background: rgba(255, 255, 255, 0.3);
+              margin: ${align === "right" ? "0 0 6px auto" : "0 auto 6px 0"};
+            }
+
+            .callout-subtitle {
+              color: rgba(255, 255, 255, 0.5);
+              letter-spacing: 2px;
+              text-transform: uppercase;
+              font-weight: 400;
+              font-size: 5.85px; /* xs: 6.5 * 0.9 = 5.85px */
+            }
+
+            /* sm: 640px - 1023px */
+            @media (min-width: 640px) {
+              .callout-title {
+                font-size: 21.6px; /* 24 * 0.9 */
+              }
+              .callout-subtitle {
+                font-size: 6.75px; /* 7.5 * 0.9 */
+              }
+            }
+
+            /* md: 1024px - 1439px */
+            @media (min-width: 1024px) {
+              .callout-title {
+                font-size: 28.8px; /* 32 * 0.9 */
+              }
+              .callout-subtitle {
+                font-size: 8.1px; /* 9 * 0.9 */
+              }
+            }
+
+            /* lg: 1440px+ */
+            @media (min-width: 1440px) {
+              .callout-title {
+                font-size: 32.4px; /* 36 * 0.9 */
+              }
+              .callout-subtitle {
+                font-size: 9px; /* 10 * 0.9 */
+              }
+            }
+          `}
+        </style>
+        <div className="callout-container">
+          <div className="callout-title">{title}</div>
+          <div className="callout-divider" />
+          <div className="callout-subtitle">{subtitle}</div>
         </div>
       </Html>
     </group>
@@ -224,44 +252,73 @@ function RightBottomCallout() {
         style={{ pointerEvents: "none" }}
         zIndexRange={[100, 0]}
       >
-        <div
-          style={{
-            textAlign: align,
-            whiteSpace: "nowrap",
-            fontFamily: "'Helvetica Neue', 'Arial', sans-serif",
-          }}
-        >
-          <div
-            style={{
-              fontSize: "32px",
-              fontWeight: "300",
-              color: "#ffffff",
-              lineHeight: "1",
-              marginTop: "40px",
-              letterSpacing: "-1px",
-            }}
-          >
-            {title}
-          </div>
-          <div
-            style={{
-              width: "40px",
-              height: "1px",
-              background: "rgba(255, 255, 255, 0.3)",
-              margin: align === "right" ? "0 0 6px auto" : "0 auto 6px 0",
-            }}
-          />
-          <div
-            style={{
-              fontSize: "9px",
-              color: "rgba(255, 255, 255, 0.5)",
-              letterSpacing: "2px",
-              textTransform: "uppercase",
-              fontWeight: "400",
-            }}
-          >
-            {subtitle}
-          </div>
+        <style>
+          {`
+            .callout-container-right {
+              text-align: ${align};
+              white-space: nowrap;
+              font-family: 'Helvetica Neue', 'Arial', sans-serif;
+            }
+
+            .callout-title-right {
+              font-weight: 300;
+              color: #ffffff;
+              line-height: 1;
+              margin-top: 40px;
+              letter-spacing: -1px;
+              font-size: 18px; /* xs: 20 * 0.9 = 18px */
+            }
+
+            .callout-divider-right {
+              width: 40px;
+              height: 1px;
+              background: rgba(255, 255, 255, 0.3);
+              margin: ${align === "right" ? "0 0 6px auto" : "0 auto 6px 0"};
+            }
+
+            .callout-subtitle-right {
+              color: rgba(255, 255, 255, 0.5);
+              letter-spacing: 2px;
+              text-transform: uppercase;
+              font-weight: 400;
+              font-size: 5.85px; /* xs: 6.5 * 0.9 = 5.85px */
+            }
+
+            /* sm: 640px - 1023px */
+            @media (min-width: 640px) {
+              .callout-title-right {
+                font-size: 21.6px; /* 24 * 0.9 */
+              }
+              .callout-subtitle-right {
+                font-size: 6.75px; /* 7.5 * 0.9 */
+              }
+            }
+
+            /* md: 1024px - 1439px */
+            @media (min-width: 1024px) {
+              .callout-title-right {
+                font-size: 28.8px; /* 32 * 0.9 */
+              }
+              .callout-subtitle-right {
+                font-size: 8.1px; /* 9 * 0.9 */
+              }
+            }
+
+            /* lg: 1440px+ */
+            @media (min-width: 1440px) {
+              .callout-title-right {
+                font-size: 32.4px; /* 36 * 0.9 */
+              }
+              .callout-subtitle-right {
+                font-size: 9px; /* 10 * 0.9 */
+              }
+            }
+          `}
+        </style>
+        <div className="callout-container-right">
+          <div className="callout-title-right">{title}</div>
+          <div className="callout-divider-right" />
+          <div className="callout-subtitle-right">{subtitle}</div>
         </div>
       </Html>
     </group>
